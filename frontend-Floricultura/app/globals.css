@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme {
+  --color-padrao: #F8FFFC;
+  --color-verdepastel: #D3F0E3;
+  --color-verdesaja: #8BC4BF;
+  --color-verdeagua: #90E8DB;
+}
+
