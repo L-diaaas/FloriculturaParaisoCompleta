@@ -13,6 +13,14 @@ type Pedido = {
   status: string;
 };
 
+type Cliente = {
+  id: number;
+  nome: string;
+  rg: string;
+  telefone: string;
+  endereco: string;
+};
+
 const statusOpcoes = ["Pendente", "Enviado", "Entregue"];
 
 export default function PaginaPedidos() {
@@ -28,6 +36,7 @@ export default function PaginaPedidos() {
 
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [editandoId, setEditandoId] = useState<number | null>(null);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const [pedidoEmEdicao, setPedidoEmEdicao] = useState<Pedido>(emptyPedido);
 
   const COR_FUNDO = "bg-[#D3F0E3]";
@@ -45,6 +54,18 @@ export default function PaginaPedidos() {
   };
 
   const API_URL = "http://127.0.0.1:5000/compras"
+
+  const API_CLIENTES = "http://localhost:5000/clientes/";
+
+  const carregarClientes = async () => {
+  try {
+    const res = await fetch(API_CLIENTES);
+    const data = await res.json();
+    setClientes(data);
+  } catch (err) {
+    console.error("Erro ao carregar clientes:", err);
+  }
+};
 
   const fetchPedidos = async () => {
     try {
@@ -71,10 +92,18 @@ export default function PaginaPedidos() {
     fetchPedidos();
   }, []);
 
+  useEffect(() => {
+    carregarClientes();
+  }, []);
+
   const handleAtualizar = (pedido: Pedido) => {
     setEditandoId(pedido.id);
     setPedidoEmEdicao(pedido);
   };
+
+  const handleFocusSelectClientes = () => {
+  carregarClientes(); // força atualizar a lista antes de mostrar
+};
 
   const handleExcluir = async (id: number) => {
     if (!window.confirm(`Tem certeza que deseja excluir o Pedido ${id}?`)) return;
