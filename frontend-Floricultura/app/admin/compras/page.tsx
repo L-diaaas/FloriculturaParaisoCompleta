@@ -44,9 +44,11 @@ export default function PaginaPedidos() {
     return pedido ? pedido.clienteNome : "Desconhecido";
   };
 
+  const API_URL = "http://127.0.0.1:5000/compras"
+
   const fetchPedidos = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/compras");
+      const res = await fetch(API_URL);
       const data = await res.json();
 
       const convertidos: Pedido[] = data.map((c: any) => ({
@@ -78,7 +80,7 @@ export default function PaginaPedidos() {
     if (!window.confirm(`Tem certeza que deseja excluir o Pedido ${id}?`)) return;
 
     try {
-      await fetch(`http://127.0.0.1:5000/compras/${id}`, {
+      await fetch(`${API_URL}/${id}`, {
         method: "DELETE",
       });
 
@@ -91,7 +93,7 @@ export default function PaginaPedidos() {
   const handleSalvar = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await fetch(`http://127.0.0.1:5000/compras/${pedidoEmEdicao.id}`, {
+      await fetch(`${API_URL}/${pedidoEmEdicao.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

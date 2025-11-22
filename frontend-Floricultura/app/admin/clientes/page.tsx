@@ -21,9 +21,6 @@ export default function PaginaClientes() {
 
   const API_URL = "http://localhost:5000/clientes";
 
-  // --------------------------------------------
-  // Carregar clientes ao abrir página
-  // --------------------------------------------
   useEffect(() => {
     fetch(API_URL + "/")
       .then((res) => res.json())
@@ -36,9 +33,6 @@ export default function PaginaClientes() {
     return true;
   };
 
-  // --------------------------------------------
-  // Criar ou atualizar cliente
-  // --------------------------------------------
   const handleSalvar = async () => {
     const payload = { nome, rg, telefone, endereco };
 
@@ -60,7 +54,6 @@ export default function PaginaClientes() {
 
         setClientes(clientes.map((c) => (c.id === editandoId ? data : c)));
       } else {
-        // POST
         const res = await fetch(API_URL + "/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -74,7 +67,7 @@ export default function PaginaClientes() {
           return;
         }
 
-        // POST retorna [obj], então pegamos data[0]
+
         setClientes([...clientes, data[0]]);
       }
 
@@ -84,9 +77,6 @@ export default function PaginaClientes() {
     }
   };
 
-  // --------------------------------------------
-  // Preencher formulário para edição
-  // --------------------------------------------
   const handleEditar = (cliente: Cliente) => {
     setEditandoId(cliente.id);
     setNome(cliente.nome);
@@ -95,9 +85,6 @@ export default function PaginaClientes() {
     setEndereco(cliente.endereco);
   };
 
-  // --------------------------------------------
-  // Excluir cliente
-  // --------------------------------------------
   const handleExcluir = async (id: number) => {
     if (!customConfirm("Tem certeza que deseja excluir este cliente?")) return;
 
