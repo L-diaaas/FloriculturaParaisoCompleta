@@ -19,10 +19,10 @@ export default function AdminHome() {
   }, [router]);
 
   const cards = [
-    { title: "Produtos", subtitle: "Quantidade", icon: "/images/produtos.png", color: "#D3F0E3", link:"/admin/produtos"},
-    { title: "Tipos", subtitle: "Nomes", icon: "/images/tipos.png", color: "#77CBBD", link:"/admin/tipos" },
-    { title: "Clientes", subtitle: "Dados", icon: "/images/clientes.png", color: "#A5D9C1", link:"/admin/clientes" },
-    { title: "Compras", subtitle: "Dados", icon: "/images/compras.png", color: "#B0E2D6", link:"/admin/compras" },
+    { title: "Produtos", subtitle: "Quantidade", icon: "/produtos.png", color: "#D3F0E3", link:"/admin/produtos"},
+    { title: "Tipos", subtitle: "Nomes", icon: "/tipos.png", color: "#77CBBD", link:"/admin/tipos" },
+    { title: "Clientes", subtitle: "Dados", icon: "/clientes.png", color: "#A5D9C1", link:"/admin/clientes" },
+    { title: "Compras", subtitle: "Dados", icon: "/compras.png", color: "#B0E2D6", link:"/admin/compras" },
   ];
 
   const filteredCards = cards.filter(
@@ -44,7 +44,7 @@ export default function AdminHome() {
         <div className="flex-1 p-6 md:p-10 bg-white min-h-screen md:ml-64">
 
           <img
-            src="/images/decorativa.png"
+            src="/decorativa.png"
             alt="Decorativa"
             className="hidden md:block absolute top-0 right-0 md:w-130 opacity-50 pointer-events-none"
           />

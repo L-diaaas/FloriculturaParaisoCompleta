@@ -11,13 +11,19 @@ export default function PaginaAdicionarProdutos() {
   const [mensagem, setMensagem] = useState("");
 
   const handleSalvar = async () => {
+    const token = localStorage.getItem("token");
 
-    /*
+    if (!token) {
+      setMensagem("Usuário não autenticado.");
+      return;
+    }
+    
     try {
       const response = await fetch("http://127.0.0.1:5000/produtos/", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json", 
+          "Authorization": `Bearer ${token}`, // TOKEN VÁLIDO (produtos é restrito então para acessar precisa de uar o token que envia no postamn auth/login, esta lá usuario e senha)
         },
         body: JSON.stringify({
           nome,
@@ -31,16 +37,12 @@ export default function PaginaAdicionarProdutos() {
         setMensagem("Produto adicionado com sucesso!");
         resetarFormulario();
       } else {
-        setMensagem("Erro ao adicionar produto.");
+        const errorData = await response.json();
+        setMensagem("Erro: " + (errorData.message || "Não foi possível adicionar."));
       }
     } catch (error) {
       setMensagem("Não foi possível conectar à API.");
     }
-    */
-
-
-    setMensagem("Produto adicionado com sucesso!");
-    resetarFormulario();
   };
 
   const resetarFormulario = () => {

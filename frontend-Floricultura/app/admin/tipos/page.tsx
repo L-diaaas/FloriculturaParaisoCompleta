@@ -89,7 +89,7 @@ export default function PaginaTipos() {
   return (
     <div
       className="min-h-screen p-4 sm:p-6 md:p-8 bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: "url('/images/tipos-img.png')" }}
+      style={{ backgroundImage: "url('/tipos-img.png')" }}
     >
       <div className="container mx-auto max-w-5xl bg-white/20 backdrop-blur-sm p-4 rounded-xl sm:p-6 md:p-8">
 

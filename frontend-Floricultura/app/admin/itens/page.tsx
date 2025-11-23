@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PlusCircle, Edit, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -12,13 +12,8 @@ type Item = {
   valor_unitario: number;
 };
 
-const mockItens: Item[] = [
-  { id: 1, compra_id: 10, produto_id: 1, quantidade: 2, valor_unitario: 12.5 },
-  { id: 2, compra_id: 12, produto_id: 2, quantidade: 1, valor_unitario: 25.0 },
-];
-
 export default function PaginaItens() {
-  const [itens, setItens] = useState<Item[]>(mockItens);
+  const [itens, setItens] = useState<Item[]>([]);
 
   const [compraId, setCompraId] = useState("");
   const [produtoId, setProdutoId] = useState("");
@@ -26,6 +21,15 @@ export default function PaginaItens() {
   const [valorUnitario, setValorUnitario] = useState("");
 
   const [editandoId, setEditandoId] = useState<number | null>(null);
+
+  const API_URL = "http://localhost:5000/itens";
+
+  useEffect(() => {
+    fetch(API_URL + "/")
+      .then((res) => res.json())
+      .then((data) => setItens(data))
+      .catch((err) => console.error("Erro ao carregar itens:", err));
+  }, []);
 
   const customConfirm = (message: string): boolean => {
     console.log(`Confirmação: ${message}`);
@@ -40,43 +44,60 @@ export default function PaginaItens() {
     setValorUnitario("");
   };
 
-  const handleSalvar = () => {
-    if (!compraId || !produtoId || !quantidade || !valorUnitario) {
+  const handleSalvar = async () => {
+    if (!compraId || !produtoId || !quantidade) {
       alert("Preencha todos os campos!");
       return;
     }
 
-    if (editandoId !== null) {
-      setItens(
-        itens.map((item) =>
-          item.id === editandoId
-            ? {
-                id: editandoId,
-                compra_id: Number(compraId),
-                produto_id: Number(produtoId),
-                quantidade: Number(quantidade),
-                valor_unitario: Number(valorUnitario),
-              }
-            : item
-        )
-      );
-    } else {
-      const novoId =
-        itens.length > 0 ? Math.max(...itens.map((i) => i.id)) + 1 : 1;
+    try {
+      if (editandoId !== null) {
+        const payload = {
+          quantidade: Number(quantidade),
+        };
 
-      setItens([
-        ...itens,
-        {
-          id: novoId,
+        const res = await fetch(`${API_URL}/${editandoId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error ?? "Erro ao atualizar item");
+          return;
+        }
+
+        setItens(itens.map((i) => (i.id === editandoId ? data : i)));
+      } else {
+        
+        const payload = {
           compra_id: Number(compraId),
           produto_id: Number(produtoId),
           quantidade: Number(quantidade),
-          valor_unitario: Number(valorUnitario),
-        },
-      ]);
-    }
+        };
 
-    resetarFormulario();
+        const res = await fetch(API_URL + "/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error ?? "Erro ao criar item");
+          return;
+        }
+
+        setItens([...itens, data]); 
+      }
+
+      resetarFormulario();
+    } catch (error) {
+      console.error("Erro ao salvar item:", error);
+    }
   };
 
   const handleEditar = (item: Item) => {
@@ -84,13 +105,15 @@ export default function PaginaItens() {
     setCompraId(String(item.compra_id));
     setProdutoId(String(item.produto_id));
     setQuantidade(String(item.quantidade));
-    setValorUnitario(String(item.valor_unitario));
+    setValorUnitario(String(item.valor_unitario)); 
   };
 
-  const handleExcluir = (id: number) => {
-    if (customConfirm("Tem certeza que deseja excluir este item?")) {
-      setItens(itens.filter((i) => i.id !== id));
-    }
+  const handleExcluir = async (id: number) => {
+    if (!customConfirm("Tem certeza que deseja excluir este item?")) return;
+
+    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+
+    setItens(itens.filter((i) => i.id !== id));
   };
 
   return (
@@ -101,7 +124,7 @@ export default function PaginaItens() {
         bg-cover bg-center bg-no-repeat
         max-sm:bg-none
       "
-      style={{ backgroundImage: "url('/images/itens-img.png')" }}
+      style={{ backgroundImage: "url('/itens-img.png')" }}
     >
       <div className="container mx-auto max-w-6xl px-2 sm:px-0">
 
@@ -122,7 +145,6 @@ export default function PaginaItens() {
         <h2 className="text-2xl font-semibold text-white mb-6 drop-shadow text-center sm:text-left">
           Gestão de Itens
         </h2>
-
 
         <div className="bg-[#D3F0E3] p-4 sm:p-6 rounded-lg shadow-lg mb-8">
           <h3 className="text-xl font-semibold mb-5 text-gray-800 text-center sm:text-left">
@@ -161,6 +183,7 @@ export default function PaginaItens() {
               className="border p-3 rounded border-[#9FC5B4]"
               value={valorUnitario}
               onChange={(e) => setValorUnitario(e.target.value)}
+              disabled // deixei campo só pra mostrar o valor_unitario durante a edição, mas ele n eedita
             />
           </div>
 
@@ -184,7 +207,6 @@ export default function PaginaItens() {
           </div>
         </div>
 
-        {/* TABELA */}
         <div className="
           bg-[#D3F0E3] rounded-lg shadow-lg 
           overflow-x-auto 
@@ -193,24 +215,12 @@ export default function PaginaItens() {
           <table className="min-w-full divide-y divide-[#9FC5B4] text-sm">
             <thead className="bg-[#9FC5B4]">
               <tr>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">
-                  ID
-                </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">
-                  Compra ID
-                </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">
-                  Produto ID
-                </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">
-                  Quantidade
-                </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">
-                  Valor Unitário
-                </th>
-                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-white uppercase">
-                  Ações
-                </th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">ID</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Compra ID</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Produto ID</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Quantidade</th>
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Valor Unitário</th>
+                <th className="px-3 sm:px-6 py-3 text-right text-xs font-medium text-white uppercase">Ações</th>
               </tr>
             </thead>
 
@@ -221,9 +231,7 @@ export default function PaginaItens() {
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.compra_id}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.produto_id}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.quantidade}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4">
-                    R$ {item.valor_unitario.toFixed(2)}
-                  </td>
+                  <td className="px-3 sm:px-6 py-3 sm:py-4">R$ {item.valor_unitario.toFixed(2)}</td>
 
                   <td className="px-3 sm:px-6 py-3 sm:py-4 text-right space-x-3">
                     <button

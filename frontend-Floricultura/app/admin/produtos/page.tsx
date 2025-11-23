@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Pencil, Trash2, Package } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 
 type Produto = {
   id: number;
@@ -16,18 +16,6 @@ type Tipo = {
   nome: string;
 };
 
-const mockTipos: Tipo[] = [
-  { id: 1, nome: "Flores" },
-  { id: 2, nome: "Buquês" },
-  { id: 3, nome: "Presentes" },
-];
-
-const initialProdutos: Produto[] = [
-  { id: 11, nome: "Lírios Rosa", quantidade: 10, preco: 39.9, tipo_id: 1 },
-  { id: 12, nome: "Buquê Romântico", quantidade: 5, preco: 120.0, tipo_id: 2 },
-  { id: 13, nome: "Caixa Presente", quantidade: 20, preco: 19.9, tipo_id: 3 },
-];
-
 const emptyProduto: Produto = {
   id: 0,
   nome: "",
@@ -37,9 +25,60 @@ const emptyProduto: Produto = {
 };
 
 export default function PaginaProdutos() {
-  const [produtos, setProdutos] = useState<Produto[]>(initialProdutos);
+
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [tipos, setTipos] = useState<Tipo[]>([]); 
   const [editandoId, setEditandoId] = useState<number | null>(null);
   const [produtoEmEdicao, setProdutoEmEdicao] = useState<Produto>(emptyProduto);
+
+  async function buscarProdutos() {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/produtos/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.log("Erro ao buscar produtos:", await response.json());
+        return;
+      }
+
+      const data = await response.json();
+      setProdutos(data);
+    } catch (error) {
+      console.log("Erro de conexão", error);
+    }
+  }
+
+  async function buscarTipos() {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch("http://127.0.0.1:5000/tipos/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.log("Erro ao buscar tipos:", await response.json());
+        return;
+      }
+
+      const data = await response.json();
+      setTipos(data);
+    } catch (error) {
+      console.log("Erro de conexão", error);
+    }
+  }
+
+  useEffect(() => {
+    buscarProdutos();
+    buscarTipos(); 
+  }, []);
 
   const COR_FUNDO = "bg-[#D3F0E3]";
   const COR_BORDA_CABECALHO = "bg-[#9FC5B4]";
@@ -47,14 +86,16 @@ export default function PaginaProdutos() {
   const COR_PRINCIPAL = "bg-emerald-600";
   const COR_PRINCIPAL_HOVER = "hover:bg-emerald-700";
 
+  // puxandi tipos de outra entidade
   const getTipoNome = (id: number) => {
-    const tipo = mockTipos.find((t) => t.id === id);
+    const tipo = tipos.find((t) => t.id === id);
     return tipo ? tipo.nome : "Tipo Desconhecido";
   };
 
   const formatCurrency = (value: number) =>
     value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+  // ------------------ AÇÕES ------------------
   const handleAtualizar = (id: number) => {
     const produto = produtos.find((p) => p.id === id);
     if (produto) {
@@ -63,10 +104,29 @@ export default function PaginaProdutos() {
     }
   };
 
-  const handleExcluir = (id: number) => {
-    if (window.confirm(`Tem certeza que deseja excluir o produto ${id}?`)) {
+  const handleExcluir = async (id: number) => {
+    if (!window.confirm(`Tem certeza que deseja excluir o produto ${id}?`)) {
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/produtos/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.log("Erro ao excluir:", await response.json());
+        return;
+      }
+
       setProdutos(produtos.filter((p) => p.id !== id));
-      setEditandoId(null);
+    } catch (error) {
+      console.log("Erro de conexão", error);
     }
   };
 
@@ -105,9 +165,9 @@ export default function PaginaProdutos() {
     }));
   };
 
+  // ------------------ RETORNO ------------------
   return (
     <div className="min-h-screen p-4 md:p-8 relative">
-      
       <img
         src="/fundoFloresRosas.jpg"
         className="absolute inset-0 w-full h-full object-cover object-top z-0 opacity-30 md:opacity-100"
@@ -116,8 +176,6 @@ export default function PaginaProdutos() {
       <div className="absolute inset-0 bg-black opacity-0 z-[5]"></div>
 
       <div className="container mx-auto max-w-6xl relative z-10">
-
-
         <a
           href="/admin/"
           className="px-4 py-2 rounded-md bg-verdesaja text-white hover:bg-teal-900 transition shadow-md inline-block"
@@ -128,7 +186,6 @@ export default function PaginaProdutos() {
         <h2 className="text-2xl md:text-3xl font-semibold text-teal-900 mb-6 pt-4">
           Gestão de Produtos
         </h2>
-
 
         <div className="flex flex-col md:flex-row justify-end gap-3 mb-6">
           <a
@@ -146,7 +203,7 @@ export default function PaginaProdutos() {
           </a>
         </div>
 
-
+        {/* FORMULÁRIO DE EDIÇÃO */}
         {editandoId !== null && (
           <div className={`${COR_FUNDO} p-6 rounded-lg shadow-lg mb-8 bg-opacity-90`}>
             <h3 className="text-xl font-semibold mb-5 text-gray-700">
@@ -154,7 +211,6 @@ export default function PaginaProdutos() {
             </h3>
 
             <form onSubmit={handleSalvar} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nome do Produto
@@ -208,7 +264,8 @@ export default function PaginaProdutos() {
                   required
                 >
                   <option value="">Selecione um tipo...</option>
-                  {mockTipos.map((tipo) => (
+
+                  {tipos.map((tipo) => (
                     <option key={tipo.id} value={tipo.id}>
                       {tipo.nome}
                     </option>
@@ -236,6 +293,7 @@ export default function PaginaProdutos() {
           </div>
         )}
 
+        {/* TABELA */}
         <div
           className={`${COR_FUNDO} rounded-lg shadow-lg overflow-hidden border border-[#9FC5B4] bg-opacity-90`}
         >
@@ -289,20 +347,24 @@ export default function PaginaProdutos() {
             </tbody>
           </table>
 
+          {/* MOBILE */}
           <div className="md:hidden divide-y divide-[#9FC5B4]">
             {produtos.map((p) => (
-              <div
-                key={p.id}
-                className="p-4"
-              >
+              <div key={p.id} className="p-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-semibold">{p.nome}</h3>
                   <span className="text-sm text-gray-600">#{p.id}</span>
                 </div>
 
-                <p className="text-sm mt-1"><strong>Quantidade:</strong> {p.quantidade}</p>
-                <p className="text-sm"><strong>Preço:</strong> {formatCurrency(p.preco)}</p>
-                <p className="text-sm mb-2"><strong>Tipo:</strong> {getTipoNome(p.tipo_id)}</p>
+                <p className="text-sm mt-1">
+                  <strong>Quantidade:</strong> {p.quantidade}
+                </p>
+                <p className="text-sm">
+                  <strong>Preço:</strong> {formatCurrency(p.preco)}
+                </p>
+                <p className="text-sm mb-2">
+                  <strong>Tipo:</strong> {getTipoNome(p.tipo_id)}
+                </p>
 
                 <div className="flex gap-4 mt-3">
                   <button
@@ -321,7 +383,6 @@ export default function PaginaProdutos() {
               </div>
             ))}
           </div>
-
         </div>
       </div>
     </div>
