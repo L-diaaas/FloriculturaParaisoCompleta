@@ -145,7 +145,6 @@ npm run dev
 ```
 http://localhost:3000
 ```
-
 ### Login
 
 - Usuário
@@ -159,4 +158,17 @@ funcionario
 ```
 flori123
 ```
+
+### Atente-se ao criar novas entidades
+
+A API segue uma ordem de cadastro, pois, ela conta com integração entre seus componentes:
+
+- I - Adicone um tipo, pois é preciso ele para criar um novo produto;
+- II - Adicione um produto;
+- III - Adicione um Item;
+- IV - Adicione um Cliente, para ele não é preciso nenhum dos ID's acima;
+- V - Adicione uma compra. Ela deve ser a última, pois, ela conta com ID's de Cliente e Itens.
+
+
+
 
