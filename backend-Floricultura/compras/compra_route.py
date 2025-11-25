@@ -65,6 +65,14 @@ def atualizar_compra(id):
 @compra_bp.route('/<int:id>', methods=['DELETE'])
 def deletar_compra(id):
     compra = Compra.query.get_or_404(id)
-    db.session.delete(compra)
-    db.session.commit()
-    return '', 204
+    try:
+      excluir_produto(id_produto)
+      db.session.delete(compra)
+      db.session.commit()  
+      return jsonify({"message": "Produto deletado com sucesso!"}), 200
+
+    except ProdutoNaoEncontrado:
+      return {"message": "Compra não encontrada."}, 404
+
+    except IntegrityError:
+        return {"message": "Não é possível excluir essa compra porque há clientes associados a ele."}, 400

@@ -20,7 +20,7 @@ export default function AdminHome() {
 
   const cards = [
     { title: "Produtos", subtitle: "Quantidade", icon: "/produtos.png", color: "#D3F0E3", link:"/admin/produtos"},
-    { title: "Tipos", subtitle: "Nomes", icon: "/tipos.png", color: "#77CBBD", link:"/admin/tipos" },
+    { title: "Itens", subtitle: "Nomes", icon: "/tipos.png", color: "#77CBBD", link:"/admin/itens" },
     { title: "Clientes", subtitle: "Dados", icon: "/clientes.png", color: "#A5D9C1", link:"/admin/clientes" },
     { title: "Compras", subtitle: "Dados", icon: "/compras.png", color: "#B0E2D6", link:"/admin/compras" },
   ];

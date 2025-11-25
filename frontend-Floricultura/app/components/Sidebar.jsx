@@ -16,9 +16,10 @@ export default function Sidebar() {
       {/* Menu */}
       <nav className="flex flex-col gap-4 text-gray-700">
         <a href="#" className="hover:text-green-700">Sobre nós</a>
-        <a href="/" className="hover:text-green-700">Início</a>
         <a href="#" className="hover:text-green-700">Contatos Adm</a>
         <a href="#" className="hover:text-green-700">Dashboard</a>
+        <a href="/admin/tipos" className="hover:text-green-700">Tipos</a>
+        <a href="/" className="hover:text-green-700">Sair</a>
       </nav>
     </aside>
   );

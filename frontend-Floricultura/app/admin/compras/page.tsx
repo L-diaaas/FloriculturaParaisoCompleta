@@ -2,6 +2,7 @@
 
 import { CheckCircle, DollarSign, Pencil, Trash2, Truck } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Pedido = {
   id: number;
@@ -187,8 +188,13 @@ export default function PaginaPedidos() {
           >
             + Adicionar Compra
           </a>
+          <Link
+            href="/admin/itens"
+            className="bg-teal-900 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-verdepastel transition-colors text-sm sm:text-base"
+          >
+            Ver Itens
+          </Link>
         </div>
-
         {editandoId !== null && (
           <div
             className={`${COR_FUNDO} p-6 rounded-lg shadow-lg mb-8 bg-opacity-90`}

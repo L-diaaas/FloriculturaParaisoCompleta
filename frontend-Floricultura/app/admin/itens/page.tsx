@@ -6,7 +6,6 @@ import Link from "next/link";
 
 type Item = {
   id: number;
-  compra_id: number;
   produto_id: number;
   quantidade: number;
   valor_unitario: number;
@@ -15,7 +14,6 @@ type Item = {
 export default function PaginaItens() {
   const [itens, setItens] = useState<Item[]>([]);
 
-  const [compraId, setCompraId] = useState("");
   const [produtoId, setProdutoId] = useState("");
   const [quantidade, setQuantidade] = useState("");
   const [valorUnitario, setValorUnitario] = useState("");
@@ -38,14 +36,13 @@ export default function PaginaItens() {
 
   const resetarFormulario = () => {
     setEditandoId(null);
-    setCompraId("");
     setProdutoId("");
     setQuantidade("");
     setValorUnitario("");
   };
 
   const handleSalvar = async () => {
-    if (!compraId || !produtoId || !quantidade) {
+    if (!produtoId || !quantidade) {
       alert("Preencha todos os campos!");
       return;
     }
@@ -73,7 +70,6 @@ export default function PaginaItens() {
       } else {
         
         const payload = {
-          compra_id: Number(compraId),
           produto_id: Number(produtoId),
           quantidade: Number(quantidade),
         };
@@ -102,7 +98,6 @@ export default function PaginaItens() {
 
   const handleEditar = (item: Item) => {
     setEditandoId(item.id);
-    setCompraId(String(item.compra_id));
     setProdutoId(String(item.produto_id));
     setQuantidade(String(item.quantidade));
     setValorUnitario(String(item.valor_unitario)); 
@@ -130,7 +125,7 @@ export default function PaginaItens() {
 
         <div className="mb-6 max-sm:flex max-sm:justify-center">
           <Link
-            href="/admin/tipos"
+            href="/admin"
             className="
               bg-[#9FC5B4] text-white px-4 py-2 
               rounded-lg hover:bg-[#8ab5a3] transition 
@@ -138,7 +133,7 @@ export default function PaginaItens() {
             "
           >
             <ArrowLeft size={18} />
-            Voltar para Tipos
+            Voltar
           </Link>
         </div>
 
@@ -151,19 +146,12 @@ export default function PaginaItens() {
             {editandoId ? "Editar Item" : "Adicionar Item"}
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              type="number"
-              placeholder="ID da Compra"
-              className="border p-3 rounded border-[#9FC5B4]"
-              value={compraId}
-              onChange={(e) => setCompraId(e.target.value)}
-            />
-
+          {/* Inputs lado a lado */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
             <input
               type="number"
               placeholder="ID do Produto"
-              className="border p-3 rounded border-[#9FC5B4]"
+              className="border p-3 rounded border-[#9FC5B4] w-full"
               value={produtoId}
               onChange={(e) => setProdutoId(e.target.value)}
             />
@@ -171,7 +159,7 @@ export default function PaginaItens() {
             <input
               type="number"
               placeholder="Quantidade"
-              className="border p-3 rounded border-[#9FC5B4]"
+              className="border p-3 rounded border-[#9FC5B4] w-full"
               value={quantidade}
               onChange={(e) => setQuantidade(e.target.value)}
             />
@@ -180,14 +168,15 @@ export default function PaginaItens() {
               type="number"
               step="0.01"
               placeholder="Valor Unitário"
-              className="border p-3 rounded border-[#9FC5B4]"
+              className="border p-3 rounded border-[#9FC5B4] w-full"
               value={valorUnitario}
               onChange={(e) => setValorUnitario(e.target.value)}
-              disabled // deixei campo só pra mostrar o valor_unitario durante a edição, mas ele n eedita
+              disabled
             />
           </div>
 
-          <div className="flex justify-end gap-3 mt-6 max-sm:justify-center">
+          {/* Botões alinhados à esquerda no rodapé */}
+          <div className="flex justify-start gap-3 mt-4">
             {editandoId && (
               <button
                 onClick={resetarFormulario}
@@ -207,6 +196,17 @@ export default function PaginaItens() {
           </div>
         </div>
 
+        <div className="flex justify-end gap-3 mt-6 max-sm:justify-center">
+            {editandoId && (
+              <button
+                onClick={resetarFormulario}
+                className="bg-gray-500 text-white px-5 py-2 rounded-lg hover:bg-gray-600"
+              >
+                Cancelar
+              </button>)}
+          </div>
+        </div>
+
         <div className="
           bg-[#D3F0E3] rounded-lg shadow-lg 
           overflow-x-auto 
@@ -216,7 +216,6 @@ export default function PaginaItens() {
             <thead className="bg-[#9FC5B4]">
               <tr>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">ID</th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Compra ID</th>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Produto ID</th>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Quantidade</th>
                 <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-white uppercase">Valor Unitário</th>
@@ -228,7 +227,6 @@ export default function PaginaItens() {
               {itens.map((item) => (
                 <tr key={item.id}>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.id}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4">{item.compra_id}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.produto_id}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">{item.quantidade}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4">R$ {item.valor_unitario.toFixed(2)}</td>
@@ -255,6 +253,5 @@ export default function PaginaItens() {
           </table>
         </div>
       </div>
-    </div>
   );
 }

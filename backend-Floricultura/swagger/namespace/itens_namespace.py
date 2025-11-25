@@ -4,8 +4,7 @@ from itens.item_route import create_item, get_item, get_all_items, update_item, 
 
 api = Namespace('itens', description='Operações relacionadas aos itens')
 
-item_model = api.model('Item', {
-    'compra_id' : fields.Integer(required=True),  # assumindo que existe tabela de compras
+item_model = api.model('Item', {  
     'produto_id' : fields.Integer(required=True),
     'quantidade' : fields.Float(required=True),
     'valor_unitario' : fields.Float(required=True)

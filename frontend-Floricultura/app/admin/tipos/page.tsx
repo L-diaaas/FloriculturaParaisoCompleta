@@ -101,17 +101,8 @@ export default function PaginaTipos() {
         </a>
 
         <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-white mb-6 mt-4 drop-shadow">
-          Gestão de Tipos de Flores
+          Gestão de Tipos de Produtos
         </h2>
-
-        <div className="flex justify-end mb-6">
-          <Link
-            href="/admin/itens"
-            className="bg-emerald-600 text-white px-4 sm:px-5 py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm sm:text-base"
-          >
-            Ver Itens
-          </Link>
-        </div>
 
 
         <div className="bg-[#D3F0E3] p-4 sm:p-6 rounded-lg shadow-lg mb-8">

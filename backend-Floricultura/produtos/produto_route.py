@@ -5,12 +5,10 @@ from produtos.produto_model import ProdutoNaoEncontrado, produto_por_id,listar_p
 produto_bp = Blueprint('produto_routes', __name__, url_prefix='/produtos')
 
 @produto_bp.route('/', methods=['GET'])
-@jwt_required()
 def get_produtos():
     return jsonify(listar_produtos())
 
 @produto_bp.route('/<int:id_produto>', methods=['GET'])
-@jwt_required()
 def get_produto(id_produto):
     try:
         produto = produto_por_id(id_produto)
@@ -20,7 +18,6 @@ def get_produto(id_produto):
         return jsonify({"message": "Produto não encontrado."}), 404
     
 @produto_bp.route('/', methods=['POST'])
-@jwt_required()
 def post_produto():
     try:
         data = request.get_json()
@@ -35,7 +32,6 @@ def post_produto():
         return jsonify({"message": f"Erro ao processar os dados: {str(e)}"}), 400
     
 @produto_bp.route('/<int:id_produto>', methods=['PUT'])
-@jwt_required()
 def put_produto(id_produto):
     try:
         data = request.get_json()
@@ -46,7 +42,6 @@ def put_produto(id_produto):
         return jsonify({"message": "Produto não encontrado."}), 404
     
 @produto_bp.route('/<int:id_produto>', methods=['DELETE'])
-@jwt_required()
 def delete_produto(id_produto):
     try:
         excluir_produto(id_produto)
@@ -54,4 +49,7 @@ def delete_produto(id_produto):
     
     except ProdutoNaoEncontrado:
         return jsonify({"message": "Produto não encontado."}), 404
+
+    except IntegrityError:
+        return jsonify({"message": "Não é possível excluir esse produto porque há itens associados a ele."}), 400
     

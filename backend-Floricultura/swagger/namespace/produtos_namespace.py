@@ -46,4 +46,6 @@ class ProdutoResource(Resource):
             return {'message': 'Produto excluído com sucesso'}
         except ProdutoNaoEncontrado:
             api.abort(404, "Produto não encontrado")
+        except IntegrityError:
+            api.abort(400, 'Não é possível excluir esse produto porque há itens associados a ele.')
         

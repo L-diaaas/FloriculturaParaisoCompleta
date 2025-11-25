@@ -9,8 +9,8 @@ item_bp = Blueprint('item_routes', __name__, url_prefix='/itens')
 def create_item():
     data = request.get_json()
 
-    if not data or 'compra_id' not in data or 'produto_id' not in data or 'quantidade' not in data:
-        return {'message': 'Dados incompletos. É necessário fornecer compra_id, produto_id e quantidade.'}, 400
+    if not data or 'produto_id' not in data or 'quantidade' not in data:
+        return {'message': 'Dados incompletos. É necessário fornecer produto_id e quantidade.'}, 400
 
     produto = Produto.query.get(data['produto_id'])
     if not produto:
@@ -20,7 +20,6 @@ def create_item():
         return {'message': f'Estoque insuficiente para o produto {produto.nome}. Disponível: {produto.quantidade}'}, 400
 
     novo_item = ItemModel(
-        compra_id=data['compra_id'],
         produto_id=data['produto_id'],
         quantidade=data['quantidade'],
         valor_unitario=produto.preco 
@@ -97,3 +96,5 @@ def delete_item(item_id):
     except Exception as e:
         db.session.rollback()
         return {'message': 'Ocorreu um erro ao deletar o item.', 'error': str(e)}, 500
+    except IntegrityError:
+        return jsonify({"message": "Não é possível excluir esse item porque há produtos associados a ele."}), 400
